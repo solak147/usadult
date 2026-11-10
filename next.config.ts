@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // AdultEmbed returns thumbnails from rotating partner CDNs, so load the
-  // source images directly instead of requiring a fixed Next Image host list.
+  // Adult video and anime APIs return images from rotating source CDNs, so
+  // load remote source images directly instead of requiring a fixed host list.
   images: { unoptimized: true },
 };
 

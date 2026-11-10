@@ -16,6 +16,7 @@ Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS origin before deployment. It suppl
 - The homepage supports server-rendered `q`, `sort`, and `page` query parameters.
 - `/video/[id]` renders title and description metadata, Open Graph metadata, `VideoObject` JSON-LD, and a scrollable sidebar of related videos.
 - `/performers` provides searchable and A–Z performer listings; `/performers/[slug]` shows the available profile data and matching scenes.
+- The homepage includes a Reya H Extractor adult anime section, filtered to adult-coded metadata and away from age-ambiguous labels; cards open internal anime detail pages with episode lists.
 - `robots.txt` allows public pages and points crawlers to the generated sitemap.
 - The sitemap currently lists the first 24 latest scenes and the first 48 popular performer profiles. A production catalogue should store/sync the AdultEmbed feed and generate paginated sitemap shards so the full catalogue is discoverable without making a large API crawl during each sitemap request.
 - No site ad placements are included yet. Connect an adult-content-compatible ad provider after domain, geography, and policy requirements are known.

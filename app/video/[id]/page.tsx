@@ -48,7 +48,7 @@ export default async function VideoPage({ params }: Props) {
   return <>
     <header className="site-header">
       <Link href="/" className="brand"><span className="brand-mark">A</span> AFTERHOURS</Link>
-      <nav className="main-nav" aria-label="Main navigation"><Link href="/">Discover</Link><Link href="/performers">Performers</Link></nav>
+      <nav className="main-nav" aria-label="Main navigation"><Link href="/">Discover</Link><Link href="/performers">Performers</Link><Link href="/#adult-anime">Adult Anime</Link></nav>
       <form action="/" className="search-form"><label className="sr-only" htmlFor="q">Search videos</label><input id="q" name="q" placeholder="Search scenes, performers…" /><button aria-label="Search">⌕</button></form>
       <span className="age-label">18+</span>
     </header>
