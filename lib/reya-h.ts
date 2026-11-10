@@ -17,16 +17,18 @@ export type AdultAnimeDetails = AdultAnime & {
   episodeCount: number;
   episodes: AdultAnimeEpisode[];
 };
+export type AdultAnimeGenre = { slug: string; name: string; url?: string };
+export type AdultAnimeGenreResults = { items: AdultAnime[]; page: number; endPage: number; hasNextPage: boolean };
 
 const API = "https://haven.reyamika.eu.cc/api";
 const SOURCE_HOSTS = new Set(["hentaihaven.com", "www.hentaihaven.com"]);
-const EXCLUDED_TERMS = /(?:shota|shotacon|loli(?:con)?|teen|young|school|student|underage|child|minor|ageplay|incest|rape|bestiality|zoophilia)/i;
-const ADULT_TERMS = /(?:milf|housewife|office[-\s]?lady|widow|married|wife|mature|人妻|熟女)/i;
+const EXCLUDED_TERMS = /(?:shota|shotacon|loli(?:con)?|teen|young|school|student|underage|child|minor|ageplay|incest|rape|bestiality|zoophilia|shounen|shoujo|classmate|schoolgirl|schoolboy|high[-\s]?school|middle[-\s]?school|elementary|kindergarten|joshikousei|koukousei|chugakusei|seifuku)/i;
+const ADULT_TERMS = /(?:milf|housewife|office[-\s]?lady|widow|married|wife|mature|mother|mom|hitozuma|tsuma|人妻|熟女)/i;
 
 export function isSafeAdultEntry(item: AdultAnime) {
   try {
     const genreText = (item.genres || []).map(genre => `${genre.slug} ${genre.name}`).join(" ");
-    const searchable = `${item.title} ${item.description || ""} ${genreText}`;
+    const searchable = `${item.title} ${item.slug} ${item.url} ${item.posterUrl} ${item.description || ""} ${genreText}`;
     const url = new URL(item.url);
     const poster = new URL(item.posterUrl);
     // Only include metadata with an adult-coded signal and exclude known
@@ -59,13 +61,44 @@ export async function getAdultAnime(slug: string): Promise<AdultAnimeDetails | n
 export async function getFeaturedAdultAnime(): Promise<AdultAnime[]> {
   try {
     const response = await fetch(`${API}/popular?offset=0&limit=48`, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(20000),
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(45000),
     });
     if (!response.ok) return [];
     const data = (await response.json()) as { items?: AdultAnime[] };
-    return (data.items || []).filter(item => item.slug && item.title && item.posterUrl && item.url && isSafeAdultEntry(item)).slice(0, 8);
+    return (data.items || []).filter(item => item.slug && item.title && item.posterUrl && item.url && isSafeAdultEntry(item)).slice(0, 24);
   } catch {
     return [];
+  }
+}
+
+export async function getAdultAnimeGenres(): Promise<AdultAnimeGenre[]> {
+  try {
+    const response = await fetch(`${API}/genres`, { cache: "no-store", signal: AbortSignal.timeout(12000) });
+    if (!response.ok) return [];
+    const data = (await response.json()) as { genres?: AdultAnimeGenre[] };
+    return (data.genres || []).filter(genre => genre.slug && genre.name && !EXCLUDED_TERMS.test(`${genre.slug} ${genre.name}`));
+  } catch {
+    return [];
+  }
+}
+
+export async function getAdultAnimeByGenre(slug: string, page = 1, availableGenres?: Promise<AdultAnimeGenre[]>): Promise<AdultAnimeGenreResults> {
+  const pageNumber = Number.isInteger(page) && page > 0 && page <= 5 ? page : 1;
+  if (!/^[a-z0-9-]+$/i.test(slug)) return { items: [], page: 1, endPage: 1, hasNextPage: false };
+  try {
+    const [genres, response] = await Promise.all([
+      availableGenres || getAdultAnimeGenres(),
+      fetch(`${API}/genres/${encodeURIComponent(slug)}?page=${pageNumber}&limit=24`, { cache: "no-store", signal: AbortSignal.timeout(20000) }),
+    ]);
+    const selectedGenre = genres.find(genre => genre.slug === slug);
+    if (!selectedGenre || !response.ok) return { items: [], page: pageNumber, endPage: 1, hasNextPage: false };
+    const data = (await response.json()) as { items?: AdultAnime[]; page?: number; endPage?: number; hasNextPage?: boolean };
+    const items = (data.items || [])
+      .filter(item => item.slug && item.title && item.posterUrl && item.url && isSafeAdultEntry(item))
+      .map(item => ({ ...item, genres: [selectedGenre] }));
+    return { items, page: data.page || pageNumber, endPage: data.endPage || 1, hasNextPage: Boolean(data.hasNextPage) && pageNumber < 5 };
+  } catch {
+    return { items: [], page: pageNumber, endPage: 1, hasNextPage: false };
   }
 }

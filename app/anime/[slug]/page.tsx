@@ -43,12 +43,12 @@ export default async function AdultAnimePage({ params, searchParams }: Props) {
   return <>
     <header className="site-header">
       <Link href="/" className="brand"><span className="brand-mark">A</span> AFTERHOURS</Link>
-      <nav className="main-nav" aria-label="Main navigation"><Link href="/">Discover</Link><Link href="/performers">Performers</Link><Link href="/#adult-anime">Adult anime</Link></nav>
+      <nav className="main-nav" aria-label="Main navigation"><Link href="/">Discover</Link><Link href="/performers">Performers</Link><Link href="/anime">Adult anime</Link></nav>
       <form action="/" className="search-form"><label className="sr-only" htmlFor="q">Search videos</label><input id="q" name="q" placeholder="Search scenes, performers…" /><button aria-label="Search">⌕</button></form>
       <span className="age-label">18+</span>
     </header>
     <main id="main" className="anime-detail-page wrap">
-      <div className="breadcrumbs"><Link href="/">Home</Link><span>/</span><Link href="/#adult-anime">Adult anime</Link><span>/</span><span>{anime.title}</span></div>
+      <div className="breadcrumbs"><Link href="/">Home</Link><span>/</span><Link href="/anime">Adult anime</Link><span>/</span><span>{anime.title}</span></div>
       {selectedEpisode && <section id="player" className="anime-watch"><div className="anime-watch-heading"><div><span className="eyebrow">NOW PLAYING</span><h1>{anime.title} — Episode {selectedEpisode}</h1></div><Link href={`/anime/${anime.slug}`} className="text-link">Back to episodes ↑</Link></div><AdultAnimePlayer slug={anime.slug} episode={selectedEpisode} poster={anime.posterUrl} /></section>}
       <section className="anime-detail-hero">
         <div className="anime-detail-poster"><Image src={anime.posterUrl} alt={anime.title} fill sizes="(max-width: 700px) 42vw, 300px" unoptimized priority /></div>

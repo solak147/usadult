@@ -1,8 +1,6 @@
-import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { browseFilterTerms, browseVideos } from "@/lib/adult-embed";
-import AdultAnimeLoader from "./ui/adult-anime-loader";
 import VideoCard from "./ui/video-card";
 
 type SearchParams = { q?: string; sort?: string; page?: string; category?: string; tag?: string };
@@ -27,7 +25,7 @@ export default async function Home({ searchParams }: Props) {
   const categoryLabel = categories.find(item => item.slug === params.category)?.name;
   const tagLabel = tags.find(item => item.slug === params.tag)?.name;
 
-  return <><header className="site-header"><Link href="/" className="brand"><span className="brand-mark">A</span> AFTERHOURS</Link><nav className="main-nav" aria-label="Main navigation"><a href="#discover">Discover</a><a href="#discover">Popular</a><a href="#filters">Categories</a><Link href="/performers">Performers</Link><a href="#adult-anime">Adult Anime</a></nav><form action="/" className="search-form"><label className="sr-only" htmlFor="q">Search videos</label><input id="q" name="q" placeholder="Search scenes, performers…" defaultValue={params.q} /><button aria-label="Search">⌕</button></form><span className="age-label">18+</span></header>
+  return <><header className="site-header"><Link href="/" className="brand"><span className="brand-mark">A</span> AFTERHOURS</Link><nav className="main-nav" aria-label="Main navigation"><a href="#discover">Discover</a><a href="#discover">Popular</a><a href="#filters">Categories</a><Link href="/performers">Performers</Link><Link href="/anime">Adult Anime</Link></nav><form action="/" className="search-form"><label className="sr-only" htmlFor="q">Search videos</label><input id="q" name="q" placeholder="Search scenes, performers…" defaultValue={params.q} /><button aria-label="Search">⌕</button></form><span className="age-label">18+</span></header>
     <main id="main">
       <section className="hero wrap" data-enter>
         <div className="hero-copy"><span className="eyebrow"><i /> THE ADULT VIDEO INDEX</span><h1>Find your<br /><em>afterhours.</em></h1><p>A sharper way to explore the scenes, studios, and performers you love.</p><a className="button button-accent" href="#discover">Explore the collection <span>↓</span></a><div className="hero-count"><strong>{data.count ? new Intl.NumberFormat("en").format(data.count) : "New"}</strong><span>videos to discover</span></div></div>
@@ -42,7 +40,6 @@ export default async function Home({ searchParams }: Props) {
         {data.results.length ? <div className="video-grid">{data.results.map((video, i) => <VideoCard key={video.id} video={video} priority={i < 4} />)}</div> : <div className="empty-state"><span>○</span><h3>No scenes found</h3><p>Try a different search, or check back soon for new additions.</p><Link href="/" className="text-link">Clear filters ↗</Link></div>}
         <div className="pagination">{Number(params.page || 1) > 1 && <Link href={hrefFor({ page: String(Number(params.page || 1) - 1) })}>← Previous</Link>}<span>Page {params.page || 1}</span>{data.next && <Link href={hrefFor({ page: String(Number(params.page || 1) + 1) })}>Next page →</Link>}</div>
       </section>
-      <Suspense fallback={<section id="adult-anime" className="adult-anime wrap" aria-label="Adult anime loading"><div className="section-heading"><div><span className="eyebrow">18+ ANIMATION</span><h2>Adult anime</h2></div></div></section>}><AdultAnimeLoader /></Suspense>
     </main>
     <footer className="site-footer"><Link href="/" className="brand"><span className="brand-mark">A</span> AFTERHOURS</Link><p>Adult content. For adults 18 and older.</p><div><span>Privacy and legal information</span><span>© 2026 Afterhours</span></div></footer>
   </>;
