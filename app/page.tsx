@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { browseFilterTerms, browseVideos } from "@/lib/adult-embed";
 import VideoCard from "./ui/video-card";
+import HeroImage from "./ui/hero-image";
 
 type SearchParams = { q?: string; sort?: string; page?: string; category?: string; tag?: string };
 type Props = { searchParams: Promise<SearchParams> };
@@ -13,7 +14,8 @@ export default async function Home({ searchParams }: Props) {
     browseFilterTerms("categories"),
     browseFilterTerms("tags"),
   ]);
-  const featured = data.results[0];
+  const featured = data.results.find(item => Boolean(item.tpdb_background_url?.trim())) || data.results[0];
+  const featuredImage = featured?.tpdb_background_url?.trim() || featured?.thumbnail;
   const hrefFor = (patch: Partial<SearchParams>) => {
     const next = { ...params, ...patch };
     const query = new URLSearchParams();
@@ -29,7 +31,7 @@ export default async function Home({ searchParams }: Props) {
     <main id="main">
       <section className="hero wrap" data-enter>
         <div className="hero-copy"><span className="eyebrow"><i /> THE ADULT VIDEO INDEX</span><h1>Find your<br /><em>afterhours.</em></h1><p>A sharper way to explore the scenes, studios, and performers you love.</p><a className="button button-accent" href="#discover">Explore the collection <span>↓</span></a><div className="hero-count"><strong>{data.count ? new Intl.NumberFormat("en").format(data.count) : "New"}</strong><span>videos to discover</span></div></div>
-        {featured ? <Link href={`/video/${featured.id}`} className="hero-feature" aria-label={`Watch ${featured.title}`}><Image src={featured.thumbnail} alt={featured.title} fill priority sizes="(max-width: 700px) 100vw, 55vw" /><span className="feature-shade" /><span className="feature-label">LATEST ADDITION <b>↗</b></span><span className="feature-duration">{featured.duration}</span></Link> : <div className="hero-feature hero-empty"><span className="feature-label">LATEST ADDITION</span><span>New scenes arrive daily.</span></div>}
+        {featured && featuredImage ? <Link href={`/video/${featured.id}`} className="hero-feature" aria-label={`Watch ${featured.title}`}><HeroImage src={featuredImage} fallbackSrc={featured.thumbnail} alt={featured.title} /><span className="feature-shade" /><span className="feature-label">LATEST ADDITION <b>↗</b></span><span className="feature-duration">{featured.duration}</span></Link> : <div className="hero-feature hero-empty"><span className="feature-label">LATEST ADDITION</span><span>New scenes arrive daily.</span></div>}
       </section>
       <section id="discover" className="collection wrap">
         <div className="section-heading"><div><span className="eyebrow">YOUR NEXT WATCH</span><h2>{categoryLabel || tagLabel ? `${categoryLabel || ""}${categoryLabel && tagLabel ? " · " : ""}${tagLabel || ""}` : params.q ? `Results for “${params.q}”` : "Recently added"}</h2></div><div className="sort-links"><a className={!params.sort || params.sort === "newest" ? "active" : ""} href={hrefFor({ sort: "newest", page: undefined })}>Newest</a><a className={params.sort === "popular" ? "active" : ""} href={hrefFor({ sort: "popular", page: undefined })}>Popular</a></div></div>

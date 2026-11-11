@@ -12,10 +12,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const video = await getVideo(id);
   if (!video) return { title: "Video unavailable" };
   const description = video.description?.slice(0, 155) || `Watch ${video.title} on Afterhours.`;
+  const poster = video.tpdb_background_url?.trim() || video.thumbnail;
   return {
     title: video.title,
     description,
-    openGraph: { title: video.title, description, type: "video.other", images: [video.thumbnail] },
+    openGraph: { title: video.title, description, type: "video.other", images: [poster] },
     alternates: { canonical: `/video/${video.id}` },
   };
 }
@@ -25,6 +26,7 @@ export default async function VideoPage({ params }: Props) {
   const video = await getVideo(id);
   if (!video) notFound();
   const relatedVideos = await getRelatedVideos(video.id, 12);
+  const poster = video.tpdb_background_url?.trim() || video.thumbnail;
   // autoplay=1 disables AdultEmbed's click-through mode, which forwards the
   // poster tap straight into a third-party source. Playback still starts on
   // the visitor's tap via the embedded player's own play control.
@@ -38,7 +40,7 @@ export default async function VideoPage({ params }: Props) {
     "@type": "VideoObject",
     name: video.title,
     description: video.description || video.title,
-    thumbnailUrl: video.thumbnail,
+    thumbnailUrl: poster,
     duration,
     uploadDate: video.published_at,
     embedUrl: playerUrl,
@@ -56,7 +58,7 @@ export default async function VideoPage({ params }: Props) {
       <div className="breadcrumbs"><Link href="/">Home</Link><span>/</span><span>Watch</span></div>
       <div className="watch-layout">
         <div className="watch-main">
-          <PlayerFrame src={playerUrl} title={video.title} thumbnail={video.thumbnail} />
+          <PlayerFrame src={playerUrl} title={video.title} thumbnail={poster} fallbackThumbnail={video.thumbnail} />
           <div className="detail-layout">
             <article className="detail-main">
               <span className="eyebrow">{video.studio?.name || "FEATURED SCENE"}</span>

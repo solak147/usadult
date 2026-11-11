@@ -4,6 +4,7 @@ export type Video = {
   title: string;
   description?: string;
   thumbnail: string;
+  tpdb_background_url?: string | null;
   duration?: string | null;
   duration_seconds?: number;
   view_count?: number;
