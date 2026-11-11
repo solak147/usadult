@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: video.title,
     description,
     openGraph: { title: video.title, description, type: "video.other", images: [poster] },
+    twitter: { card: "summary_large_image", title: video.title, description, images: [poster] },
     alternates: { canonical: `/video/${video.id}` },
   };
 }
@@ -45,6 +46,29 @@ export default async function VideoPage({ params }: Props) {
     uploadDate: video.published_at,
     embedUrl: playerUrl,
     url: `${siteUrl}/video/${video.id}`,
+    actor: video.performers?.map(p => ({
+      "@type": "Person",
+      name: p.name,
+      url: `${siteUrl}/performers/${p.slug}`,
+    })),
+    productionCompany: video.studio ? {
+      "@type": "Organization",
+      name: video.studio.name,
+    } : undefined,
+    interactionStatistic: video.view_count ? {
+      "@type": "InteractionCounter",
+      interactionType: { "@type": "WatchAction" },
+      userInteractionCount: video.view_count,
+    } : undefined,
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Watch", item: `${siteUrl}/video/${video.id}` },
+      { "@type": "ListItem", position: 3, name: video.title, item: `${siteUrl}/video/${video.id}` },
+    ],
   };
 
   return <>
@@ -73,6 +97,7 @@ export default async function VideoPage({ params }: Props) {
         <aside className="detail-aside related-aside"><h2>Recommendations</h2><RelatedVideos videos={relatedVideos} /></aside>
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c") }} />
     </main>
     <footer className="site-footer"><Link href="/" className="brand"><span className="brand-mark">A</span> AFTERHOURS</Link><p>Adult content. For adults 18 and older.</p><div><span>Privacy and legal information</span><span>© 2026 Afterhours</span></div></footer>
   </>;

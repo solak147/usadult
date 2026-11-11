@@ -5,12 +5,36 @@ import AgeGate from "./ui/age-gate";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://afterhours.example";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  other: { "page-type": "software", "site-kind": "software" },
   title: { default: "Afterhours — Adult Video Discovery", template: "%s | Afterhours" },
   description: "Browse a carefully indexed collection of adult videos. Find scenes by category, performer, studio, and more.",
   applicationName: "Afterhours",
-  robots: { index: true, follow: true },
-  openGraph: { type: "website", siteName: "Afterhours", title: "Afterhours — Adult Video Discovery", description: "A considered way to discover adult video." },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Afterhours",
+    title: "Afterhours — Adult Video Discovery",
+    description: "A considered way to discover adult video.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Afterhours — Adult Video Discovery",
+    description: "A considered way to discover adult video.",
+  },
+  other: {
+    rating: "RTA-5042-1996-1400-1577-RTA",
+    "rating-type": "adult",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

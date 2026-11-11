@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     alternates: { canonical: `/anime/${anime.slug}` },
     openGraph: { title: anime.title, description, type: "video.tv_show", images: [anime.posterUrl] },
+    twitter: { card: "summary_large_image", title: anime.title, description, images: [anime.posterUrl] },
   };
 }
 
@@ -39,6 +40,15 @@ export default async function AdultAnimePage({ params, searchParams }: Props) {
     datePublished: anime.years?.[0] ? String(anime.years[0]) : undefined,
     url: `${siteUrl}/anime/${anime.slug}`,
   };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Adult Anime", item: `${siteUrl}/anime` },
+      { "@type": "ListItem", position: 3, name: anime.title, item: `${siteUrl}/anime/${anime.slug}` },
+    ],
+  };
 
   return <>
     <header className="site-header">
@@ -56,6 +66,7 @@ export default async function AdultAnimePage({ params, searchParams }: Props) {
       </section>
       <section className="anime-episodes" aria-labelledby="episodes-title"><div className="section-heading"><div><span className="eyebrow">WATCH IN ORDER</span><h2 id="episodes-title">Episodes</h2></div><span>{anime.episodes.length} available</span></div><div className="episode-grid">{anime.episodes.map(episode => <Link key={episode.id} className={selectedEpisode === episode.number ? "episode-card selected" : "episode-card"} href={`/anime/${anime.slug}?episode=${episode.number}#player`}><span className="episode-number">{String(episode.number).padStart(2, "0")}</span><span className="episode-title">{episode.title || `Episode ${episode.number}`}</span><span className="episode-arrow" aria-hidden="true">↗</span></Link>)}</div></section>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c") }} />
     </main>
     <footer className="site-footer"><Link href="/" className="brand"><span className="brand-mark">A</span> AFTERHOURS</Link><p>Adult content. For adults 18 and older.</p><div><span>Privacy and legal information</span><span>© 2026 Afterhours</span></div></footer>
   </>;

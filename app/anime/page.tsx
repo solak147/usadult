@@ -15,6 +15,11 @@ export const metadata: Metadata = {
     description: "Browse adult anime series and episode guides.",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Adult Anime | Afterhours",
+    description: "Browse adult anime series and episode guides.",
+  },
 };
 
 export default async function AdultAnimeIndexPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
@@ -43,6 +48,14 @@ export default async function AdultAnimeIndexPage({ searchParams }: { searchPara
       position: index + 1,
       item: { "@type": "TVSeries", name: title.title, url: `${siteUrl}/anime/${title.slug}`, image: title.posterUrl },
     })),
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Adult Anime", item: `${siteUrl}/anime` },
+    ],
   };
   const genreHref = (slug?: string, page?: number) => {
     const query = new URLSearchParams();
@@ -92,6 +105,7 @@ export default async function AdultAnimeIndexPage({ searchParams }: { searchPara
         <span>Page {activePage}</span>
         {genreResults?.hasNextPage ? <Link href={genreHref(selectedGenre.slug, activePage + 1)}>Next page →</Link> : <span />}
       </div>}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c") }} />
       {titles.length > 0 && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList).replace(/</g, "\\u003c") }} />}
     </main>
     <footer className="site-footer"><Link href="/" className="brand"><span className="brand-mark">A</span> AFTERHOURS</Link><p>Adult content. For adults 18 and older.</p><div><span>Privacy and legal information</span><span>© 2026 Afterhours</span></div></footer>
