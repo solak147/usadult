@@ -31,6 +31,15 @@ export const metadata: Metadata = {
     title: "Afterhours — Adult Video Discovery",
     description: "A considered way to discover adult video.",
   },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   other: {
     rating: "RTA-5042-1996-1400-1577-RTA",
     "rating-type": "adult",
