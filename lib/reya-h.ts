@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 export type AdultAnime = {
   id?: string;
   slug: string;
@@ -42,11 +44,11 @@ export function isSafeAdultEntry(item: AdultAnime) {
   }
 }
 
-export async function getAdultAnime(slug: string): Promise<AdultAnimeDetails | null> {
+export const getAdultAnime = cache(async (slug: string): Promise<AdultAnimeDetails | null> => {
   if (!/^[a-z0-9-]+$/i.test(slug)) return null;
   try {
     const response = await fetch(`${API}/anime/${slug}`, {
-      cache: "no-store",
+      next: { revalidate: 3600 },
       signal: AbortSignal.timeout(8000),
     });
     if (!response.ok) return null;
@@ -56,7 +58,7 @@ export async function getAdultAnime(slug: string): Promise<AdultAnimeDetails | n
   } catch {
     return null;
   }
-}
+});
 
 export async function getFeaturedAdultAnime(): Promise<AdultAnime[]> {
   try {

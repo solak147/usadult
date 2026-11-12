@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 export type Video = {
   id: number;
   slug: string;
@@ -78,7 +80,7 @@ export async function browsePerformers(params: { search?: string; letter?: strin
   }
 }
 
-export async function getPerformer(slug: string): Promise<PerformerProfile | null> {
+export const getPerformer = cache(async (slug: string): Promise<PerformerProfile | null> => {
   if (!/^[a-z0-9-]+$/i.test(slug)) return null;
   try {
     const response = await fetch(`https://adultembed.com/api/v1/performers/${slug}`, { next: { revalidate: 3600 } });
@@ -86,9 +88,9 @@ export async function getPerformer(slug: string): Promise<PerformerProfile | nul
   } catch {
     return null;
   }
-}
+});
 
-export async function getVideo(id: string): Promise<Video | null> {
+export const getVideo = cache(async (id: string): Promise<Video | null> => {
   if (!/^\d+$/.test(id)) return null;
   try {
     // The legacy browse endpoint used by this starter pairs with /api/videos/{id}/.
@@ -97,9 +99,9 @@ export async function getVideo(id: string): Promise<Video | null> {
   } catch {
     return null;
   }
-}
+});
 
-export async function getRelatedVideos(id: number, limit = 10): Promise<Video[]> {
+export const getRelatedVideos = cache(async (id: number, limit = 10): Promise<Video[]> => {
   try {
     const url = new URL(`https://adultembed.com/api/v1/videos/${id}/related`);
     url.searchParams.set("limit", String(Math.min(Math.max(limit, 1), 20)));
@@ -128,7 +130,7 @@ export async function getRelatedVideos(id: number, limit = 10): Promise<Video[]>
   } catch {
     return [];
   }
-}
+});
 
 export function formatViews(value = 0) {
   return new Intl.NumberFormat("en", { notation: value > 9999 ? "compact" : "standard", maximumFractionDigits: 1 }).format(value);

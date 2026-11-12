@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { getRelatedVideos, getVideo } from "@/lib/adult-embed";
 import RelatedVideos from "../../ui/related-videos";
 import PlayerFrame from "../../ui/player-frame";
@@ -22,11 +23,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+async function Recommendations({ videoId }: { videoId: number }) {
+  const relatedVideos = await getRelatedVideos(videoId, 12);
+  return <RelatedVideos videos={relatedVideos} />;
+}
+
+function RecommendationsSkeleton() {
+  return (
+    <div className="related-scroll" aria-label="Loading recommendations">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="related-card-skeleton">
+          <div className="skeleton-thumb skeleton-shimmer" />
+          <div className="skeleton-related-info">
+            <div className="skeleton-line skeleton-shimmer" style={{ width: "90%", height: "13px", marginBottom: "8px" }} />
+            <div className="skeleton-line skeleton-shimmer" style={{ width: "55%", height: "11px" }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default async function VideoPage({ params }: Props) {
   const { id } = await params;
   const video = await getVideo(id);
   if (!video) notFound();
-  const relatedVideos = await getRelatedVideos(video.id, 12);
   const poster = video.tpdb_background_url?.trim() || video.thumbnail;
   // autoplay=1 disables AdultEmbed's click-through mode, which forwards the
   // poster tap straight into a third-party source. Playback still starts on
@@ -94,7 +115,12 @@ export default async function VideoPage({ params }: Props) {
             </article>
           </div>
         </div>
-        <aside className="detail-aside related-aside"><h2>Recommendations</h2><RelatedVideos videos={relatedVideos} /></aside>
+        <aside className="detail-aside related-aside">
+          <h2>Recommendations</h2>
+          <Suspense fallback={<RecommendationsSkeleton />}>
+            <Recommendations videoId={video.id} />
+          </Suspense>
+        </aside>
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c") }} />

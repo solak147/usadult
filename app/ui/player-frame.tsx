@@ -35,7 +35,7 @@ export default function PlayerFrame({
   }, []);
 
   return <div className="player-frame">
-    <iframe ref={frame} src={src} title={title} allow="autoplay; fullscreen; picture-in-picture" allowFullScreen referrerPolicy="origin" onFocus={() => setStarted(true)} />
+    <iframe ref={frame} src={src} title={title} allow="autoplay; fullscreen; picture-in-picture" allowFullScreen referrerPolicy="origin" onFocus={() => setStarted(true)} loading="lazy" />
     {!started && <div className="player-poster" aria-hidden="true">
       <Image
         src={currentPoster}
